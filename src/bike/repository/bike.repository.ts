@@ -17,6 +17,20 @@ export class BikeRepository {
     });
   }
 
+  findById({ id }: { id: number }): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.db
+        .getDB()
+        .get('SELECT * FROM bikes WHERE id = ?', [id], (err, row) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(row);
+          }
+        });
+    });
+  }
+
   existsOrThrow({ id }: { id: number }): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db
@@ -35,7 +49,7 @@ export class BikeRepository {
     });
   }
 
-  create({
+  async create({
     make,
     model,
     year,
@@ -45,8 +59,8 @@ export class BikeRepository {
     model: string;
     year: number;
     type: string;
-  }): Promise<void> {
-    return new Promise((resolve, reject) => {
+  }): Promise<any> {
+    const id: number = await new Promise((resolve, reject) => {
       this.db
         .getDB()
         .run(
@@ -56,11 +70,12 @@ export class BikeRepository {
             if (err) {
               reject(err);
             } else {
-              resolve();
+              resolve(this.lastID);
             }
           },
         );
     });
+    return this.findById({ id });
   }
 
   async update({
@@ -77,7 +92,7 @@ export class BikeRepository {
     type?: string;
   }): Promise<void> {
     await this.existsOrThrow({ id });
-    return new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       this.db.getDB().run(
         `
         UPDATE bikes 
@@ -92,25 +107,28 @@ export class BikeRepository {
           if (err) {
             reject(err);
           } else {
-            resolve();
+            resolve(undefined);
           }
         },
       );
     });
+    return this.findById({ id });
   }
 
   async delete({ id }: { id: number }): Promise<void> {
     await this.existsOrThrow({ id });
-    return new Promise((resolve, reject) => {
+    const row = await this.findById({ id });
+    await new Promise((resolve, reject) => {
       this.db
         .getDB()
         .run(`DELETE FROM bikes WHERE id = ?`, [id], function (err) {
           if (err) {
             reject(err);
           } else {
-            resolve();
+            resolve(undefined);
           }
         });
     });
+    return row;
   }
 }

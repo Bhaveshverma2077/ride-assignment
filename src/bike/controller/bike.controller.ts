@@ -33,8 +33,9 @@ export class BikeController {
 
   @ApiOperation({ summary: 'Create Bike' })
   @ApiResponse({
-    status: 200,
-    description: 'No Response',
+    status: 201,
+    description: 'Created Bike',
+    type: Bike,
   })
   @Post()
   addBike(@Body(ClassValidationPipe) body: AddBikeDto): any {
@@ -44,7 +45,8 @@ export class BikeController {
   @ApiOperation({ summary: 'Replace Bike' })
   @ApiResponse({
     status: 200,
-    description: 'No Response',
+    description: 'Updated Bike',
+    type: Bike,
   })
   @Put(':id')
   async replaceBike(
@@ -57,7 +59,8 @@ export class BikeController {
   @ApiOperation({ summary: 'Update Bike' })
   @ApiResponse({
     status: 200,
-    description: 'No Response',
+    description: 'Updated Bike',
+    type: Bike,
   })
   @Patch(':id')
   async patchBike(
@@ -70,7 +73,8 @@ export class BikeController {
   @ApiOperation({ summary: 'Delete Bike' })
   @ApiResponse({
     status: 200,
-    description: 'No Response',
+    description: 'Deleted Bike',
+    type: Bike,
   })
   @Delete(':id')
   deleteBike(@Param('id', ParseIntPipe) id: number): Promise<any> {
